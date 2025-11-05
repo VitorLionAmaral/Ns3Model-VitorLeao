@@ -1,0 +1,75 @@
+import matplotlib.pyplot as plt
+import re
+import os
+import numpy as np
+
+# === Configurações ===
+folder = "results"  # pasta onde estão os arquivos .txt
+protocols = ["TcpCubic", "TcpNewReno"]
+flows_list = [2, 4, 6, 8]  # quantidades de fluxos testadas
+destinos = ["Dest1", "Dest2"]
+
+# === Estrutura de dados ===
+# data[protocolo][destino][num_fluxos] = [lista de 10 valores]
+data = {proto: {dest: {f: [] for f in flows_list} for dest in destinos} for proto in protocols}
+
+# === Leitura dos arquivos ===
+for file in os.listdir(folder):
+    if file.endswith(".txt"):
+        path = os.path.join(folder, file)
+        with open(path) as f:
+            content = f.read()
+
+            # Detectar protocolo
+            if "Cubic" in file:
+                proto = "TcpCubic"
+            elif "NewReno" in file:
+                proto = "TcpNewReno"
+            else:
+                continue
+
+            # Detectar número de fluxos
+            match_flow = re.search(r"(\d+)flows", file)
+            if not match_flow:
+                continue
+            nflow = int(match_flow.group(1))
+            if nflow not in flows_list:
+                continue
+
+            # Extrair valores do texto
+            d1 = re.search(r"Goodput médio Dest1 \(Mbps\): ([\d.]+)", content)
+            d2 = re.search(r"Goodput médio Dest2 \(Mbps\): ([\d.]+)", content)
+
+            if d1 and d2:
+                data[proto]["Dest1"][nflow].append(float(d1.group(1)))
+                data[proto]["Dest2"][nflow].append(float(d2.group(1)))
+
+# === Plotar figura 2x2 ===
+fig, axs = plt.subplots(2, 2, figsize=(10, 8), sharex=True, sharey=True)
+fig.suptitle("Goodput Médio por Destino e Protocolo", fontsize=14)
+
+for col, proto in enumerate(protocols):
+    for row, dest in enumerate(destinos):
+        ax = axs[row, col]
+        means = []
+        stds = []
+
+        for nf in flows_list:
+            values = data[proto][dest][nf]
+            if len(values) > 0:
+                means.append(np.mean(values))
+                stds.append(np.std(values))
+            else:
+                means.append(0)
+                stds.append(0)
+
+        ax.errorbar(flows_list, means, yerr=stds, fmt='-o', capsize=5)
+        ax.set_title(f"{proto} - {dest}")
+        ax.set_xlabel("Número de fluxos TCP")
+        ax.set_ylabel("Goodput (Mbps)")
+        ax.grid(True)
+        ax.set_xticks(flows_list)
+
+plt.tight_layout(rect=[0, 0, 1, 0.96])
+plt.savefig("goodput_summary.png", dpi=300)
+plt.show()
