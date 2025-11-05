@@ -1,0 +1,54 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+delays = [50, 100, 150, 200, 250, 300]
+
+cubic_1_flow = [0.746905, 0.577238, 0.493634, 0.446914,  0.477651, 0.382981]
+cubic_2_flows = [0.928253, 0.920876, 0.885221, 0.868008, 0.818215, 0.727848]
+cubic_4_flows = [ 0.923949,  0.900589, 0.868623,  0.851411, 0.849566, 0.813297]
+
+newreno_1_flow = [0.480724, 0.288312,  0.202863,  0.179503, 0.161676, 0.134627]
+newreno_2_flows = [ 0.829895, 0.536051, 0.521912,  0.439537, 0.399579, 0.328884]
+newreno_4_flows = [ 0.928253, 0.916573, 0.802846, 0.621499, 0.544657,  0.496707]
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
+
+# Gráfico do NewReno (esquerda)
+ax1.plot(delays, newreno_1_flow, label="1 Fluxo", color="#D1495B", marker="o", linewidth=2.5, markersize=8)
+ax1.plot(delays, newreno_2_flows, label="2 Fluxos", color="#EDAE49", marker="s", linestyle="--", linewidth=2.5, markersize=8)
+ax1.plot(delays, newreno_4_flows, label="4 Fluxos", color="#F26A3D", marker="^", linestyle="-.", linewidth=2.5, markersize=8)
+
+ax1.set_title("TCP NewReno - Goodput vs Atraso", fontsize=14, fontweight='bold')
+ax1.set_xlabel("Atraso do Link de Bottleneck (ms)", fontsize=12)
+ax1.set_ylabel("Goodput Agregado (Mbps)", fontsize=12)
+ax1.legend(fontsize=11, framealpha=0.9)
+ax1.grid(True, linestyle=":", alpha=0.7)
+ax1.set_ylim(0, 1.1)
+ax1.set_xticks(delays)
+ax1.axhline(y=1.0, color='gray', linestyle=':', alpha=0.5, label='Capacidade Máxima')
+
+# Gráfico do CUBIC (direita)
+ax2.plot(delays, cubic_1_flow, label="1 Fluxo", color="#2E86AB", marker="o", linewidth=2.5, markersize=8)
+ax2.plot(delays, cubic_2_flows, label="2 Fluxos", color="#1B998B", marker="s", linestyle="--", linewidth=2.5, markersize=8)
+ax2.plot(delays, cubic_4_flows, label="4 Fluxos", color="#A8D5BA", marker="^", linestyle="-.", linewidth=2.5, markersize=8)
+
+ax2.set_title("TCP CUBIC - Goodput vs Atraso", fontsize=14, fontweight='bold')
+ax2.set_xlabel("Atraso do Link de Bottleneck (ms)", fontsize=12)
+ax2.set_ylabel("Goodput Agregado (Mbps)", fontsize=12)
+ax2.legend(fontsize=11, framealpha=0.9)
+ax2.grid(True, linestyle=":", alpha=0.7)
+ax2.set_ylim(0, 1.1)
+ax2.set_xticks(delays)
+ax2.axhline(y=1.0, color='gray', linestyle=':', alpha=0.5, label='Capacidade Máxima')
+
+# Título geral da figura
+fig.suptitle("Comparação de Desempenho: Goodput Agregado vs Atraso do Bottleneck\n(Taxa de Enlace: 1 Mbps)", 
+             fontsize=16, fontweight='bold', y=1.0)
+
+plt.tight_layout()
+plt.subplots_adjust(top=0.88)
+
+output_filename = "comparison_newreno_cubic.png"
+plt.savefig(output_filename, dpi=300, bbox_inches='tight')
+
+print(f"Gráfico salvo como: {output_filename}")
+plt.show()
