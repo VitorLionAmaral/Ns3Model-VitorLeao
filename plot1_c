@@ -1,0 +1,57 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Taxas de erro (error rates)
+error_rates = [1e-05, 5e-05, 0.0001, 0.0005, 0.001, 0.005]
+
+# Goodputs em Mbps
+cubic_1_flow = [0.929482, 0.563714, 0.614737, 0.0135242, 0.00122947, 0]
+cubic_2_flows = [0.935629, 0.886451, 0.555722, 0.0153684, 0.00368842, 0]
+cubic_4_flows = [0.927638, 0.885221, 0.730922, 0.0196716, 0.00860632, 0]
+
+newreno_1_flow = [0.933785, 0.542813, 0.18688, 0.00307368, 0.00122947, 0]
+newreno_2_flows = [0.935015, 0.825592, 0.354703, 0.0209011, 0.00430316, 0]
+newreno_4_flows = [0.935629, 0.881533, 0.705718, 0.0276632, 0.00307368, 0]
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
+
+# --- TCP NewReno (esquerda)
+ax1.plot(error_rates, newreno_1_flow, label="1 Fluxo", color="#D1495B", marker="o", linewidth=2.5, markersize=8)
+ax1.plot(error_rates, newreno_2_flows, label="2 Fluxos", color="#EDAE49", marker="s", linestyle="--", linewidth=2.5, markersize=8)
+ax1.plot(error_rates, newreno_4_flows, label="4 Fluxos", color="#F26A3D", marker="^", linestyle="-.", linewidth=2.5, markersize=8)
+
+ax1.set_title("TCP NewReno - Goodput vs Taxa de Erro", fontsize=14, fontweight='bold')
+ax1.set_xlabel("Taxa de Erro do Link de Bottleneck", fontsize=12)
+ax1.set_ylabel("Goodput Agregado (Mbps)", fontsize=12)
+ax1.legend(fontsize=11, framealpha=0.9)
+ax1.grid(True, linestyle=":", alpha=0.7)
+ax1.set_ylim(0, 1.1)
+ax1.set_xscale('log')  # Escala logarítmica no eixo X
+ax1.axhline(y=1.0, color='gray', linestyle=':', alpha=0.5)
+
+# --- TCP CUBIC (direita)
+ax2.plot(error_rates, cubic_1_flow, label="1 Fluxo", color="#2E86AB", marker="o", linewidth=2.5, markersize=8)
+ax2.plot(error_rates, cubic_2_flows, label="2 Fluxos", color="#1B998B", marker="s", linestyle="--", linewidth=2.5, markersize=8)
+ax2.plot(error_rates, cubic_4_flows, label="4 Fluxos", color="#A8D5BA", marker="^", linestyle="-.", linewidth=2.5, markersize=8)
+
+ax2.set_title("TCP CUBIC - Goodput vs Taxa de Erro", fontsize=14, fontweight='bold')
+ax2.set_xlabel("Taxa de Erro do Link de Bottleneck", fontsize=12)
+ax2.set_ylabel("Goodput Agregado (Mbps)", fontsize=12)
+ax2.legend(fontsize=11, framealpha=0.9)
+ax2.grid(True, linestyle=":", alpha=0.7)
+ax2.set_ylim(0, 1.1)
+ax2.set_xscale('log')  # Escala logarítmica no eixo X
+ax2.axhline(y=1.0, color='gray', linestyle=':', alpha=0.5)
+
+# --- Título geral da figura
+fig.suptitle("Comparação de Desempenho: Goodput Agregado vs Taxa de Erro do Bottleneck\n(Taxa de Enlace: 1 Mbps, Atraso = 1 ms)", 
+             fontsize=16, fontweight='bold', y=1)
+
+plt.tight_layout()
+plt.subplots_adjust(top=0.88)
+
+output_filename = "comparison_newreno_cubic_errorrate.png"
+plt.savefig(output_filename, dpi=300, bbox_inches='tight')
+
+print(f"✅ Gráfico salvo como: {output_filename}")
+plt.show()
